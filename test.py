@@ -50,7 +50,7 @@ a.show()
 # ])
 
 # # 2. Create model
-# model = ChatGroq(model="llama3-8b-8192", api_key='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')
+# model = ChatGroq(model="llama3-8b-8192", api_key='')
 
 # # 3. Create parser
 # parser = StrOutputParser()
