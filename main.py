@@ -9,6 +9,7 @@ import pygetwindow
 import pyautogui
 from PIL import Image
 import numpy as np
+import time
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -20,6 +21,19 @@ ocr = PaddleOCR(use_angle_cls=False, lang='en', use_gpu=True, det_model_dir="en_
 window = pygetwindow.getWindowsWithTitle("BlueStacks App Player")[0]
 left, top = window.topleft
 right, bottom = window.bottomright
+window_width = right - left
+window_height = bottom - top
+
+crop_left = int(0.066 * window_width)     
+crop_top = int(0.473 * window_height)     
+crop_right = int(0.133 * window_width)    
+crop_bottom = int(0.022 * window_height)  
+crop_text = int(0.1731*window_width)
+
+# Tọa độ tương đối cho vị trí nhấp chuột, ví dụ ở giữa cửa sổ
+# click_x = left + int(window_width * 0.9087)   # 96.4
+# click_y = top + int(window_height * 0.9262)   # 50% của chiều cao cửa sổ
+
 
 
 system_template = "This is my data {data}:"
@@ -81,13 +95,16 @@ async def sayHello(interaction: discord.Interaction):
 
 @client.tree.command(name="bosscheck", description="Kiem tra dmg boss", guild=GUILD_ID)
 async def sayHello(interaction: discord.Interaction):
-
-    a = pyautogui.screenshot(region=(left, top, right - left, bottom - top))
-    a = a.crop((50, 220, right - left - 100, bottom - top - 10))
-    a = np.array(a)
-    height, width, _ = a.shape
-    a[height-130:height, width-130:width] = [255, 255, 255]
-    result = ocr.ocr(a, cls=False)
+    # Thực hiện sự kiện nhấp chuột
+    # pyautogui.click(click_x, click_y)
+    # # Đợi một chút để cửa sổ phản ứng
+    # time.sleep(1) 
+    window = pyautogui.screenshot(region=(left, top, window_width, window_height))
+    window = window.crop((crop_left, crop_top, window_width - crop_right, window_height - crop_bottom))
+    window = np.array(window)
+    height, width, _ = window.shape
+    window[height-crop_text:height, width-crop_text:width] = [255, 255, 255]
+    result = ocr.ocr(window, cls=False)
     text_output = ""
     for idx in range(len(result)):
         res = result[idx]

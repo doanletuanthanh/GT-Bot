@@ -15,6 +15,8 @@ import pygetwindow
 import pyautogui
 from PIL import Image
 import numpy as np
+import time
+
 
 path = 'result_capture.jpg'
 titles = pygetwindow.getAllTitles()
@@ -22,14 +24,37 @@ titles = pygetwindow.getAllTitles()
 window = pygetwindow.getWindowsWithTitle("BlueStacks App Player")[0]
 left, top = window.topleft
 right, bottom = window.bottomright
-a = pyautogui.screenshot(region=(left, top, right - left, bottom - top))
+window_width = right - left
+window_height = bottom - top
+print(left, top, right, bottom)
 
-a = a.crop((50, 220, right - left - 100, bottom - top - 10))
-a = np.array(a)
-height, width, _ = a.shape
-a[height-130:height, width-130:width] = [255, 255, 255]
-a = Image.fromarray(a)
-a.show()
+
+# Tọa độ tương đối cho vị trí nhấp chuột, ví dụ ở giữa cửa sổ
+click_x = left + int(window_width * 0.9087)   # 96.4
+click_y = top + int(window_height * 0.9262)   # 50% của chiều cao cửa sổ
+# Thực hiện sự kiện nhấp chuột
+pyautogui.click(click_x, click_y)
+time.sleep(1)  
+
+
+
+# a = pyautogui.screenshot(region=(left, top, window_width, window_height))
+
+# crop_left = int(0.066 * window_width)     # 50px / 751px ~ 6.6%
+# crop_top = int(0.473 * window_height)     # 220px / 464px ~ 47.4%
+# crop_right = int(0.133 * window_width)    # 100px / 751px ~ 13.3% (751 - 100 = 651)
+# crop_bottom = int(0.022 * window_height)  # 10px / 464px ~ 2.2% (464 - 10 = 454)
+# crop_text = int(0.1731*window_width)
+# print(crop_left, crop_top, crop_right, crop_bottom)
+# # # Cắt ảnh với tỷ lệ thay vì giá trị cố định
+
+# # a = a.crop((crop_left, crop_top, window_width - crop_right, window_height - crop_bottom))
+# # a = a.crop((50, 220, right - left - 100, bottom - top - 10))
+# a = np.array(a)
+# height, width, _ = a.shape
+# a[height-crop_text:height, width-crop_text:width] = [255, 255, 255]
+# a = Image.fromarray(a)
+# a.show()
 # from langchain_core.prompts import ChatPromptTemplate
 # from langchain_core.output_parsers import StrOutputParser
 # from langchain_groq import ChatGroq
@@ -50,7 +75,7 @@ a.show()
 # ])
 
 # # 2. Create model
-# model = ChatGroq(model="llama3-8b-8192", api_key='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')
+# model = ChatGroq(model="llama3-8b-8192", api_key='')
 
 # # 3. Create parser
 # parser = StrOutputParser()
