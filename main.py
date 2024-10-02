@@ -16,7 +16,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_groq import ChatGroq
 
 ocr = PaddleOCR(use_angle_cls=False, lang='en', use_gpu=True, det_model_dir="en_number_mobile_v2.0_rec_infer.tar")
-# img_path = 'test-image-2.jpg'
 
 window = pygetwindow.getWindowsWithTitle("BlueStacks App Player")[0]
 left, top = window.topleft
@@ -24,26 +23,21 @@ right, bottom = window.bottomright
 window_width = right - left
 window_height = bottom - top
 
-crop_left = int(0.066 * window_width)     
-crop_top = int(0.473 * window_height)     
-crop_right = int(0.133 * window_width)    
-crop_bottom = int(0.022 * window_height)  
+crop_left = int(0.066 * window_width)     # 50px / 751px ~ 6.6%
+crop_top = int(0.45 * window_height)     # 220px / 464px ~ 47.4%
+crop_right = int(0.08 * window_width)    # 100px / 751px ~ 13.3% (751 - 100 = 651)
+crop_bottom = int(0.08 * window_height)  # 10px / 464px ~ 2.2% (464 - 10 = 454)
 crop_text = int(0.1731*window_width)
 
-# Tọa độ tương đối cho vị trí nhấp chuột, ví dụ ở giữa cửa sổ
-# click_x = left + int(window_width * 0.9087)   # 96.4
-# click_y = top + int(window_height * 0.9262)   # 50% của chiều cao cửa sổ
-
-
-
+# 1. Create prompt
 system_template = "This is my data {data}:"
 prmt_template="""
-i want you to correct the spelling and calculate the percent hp boss, just return like the format below, not any more word from you, not "Here is the corrected and formatted data:"
+i want you to correct the spelling boss name and calculate the percent base on the number given, just return like the format below, not any more word from you, not "Here is the corrected and formatted data:"
 
-Lv.105 Founder Elphaba (305,330,795/400,000,000) 75% 
-Lv.105 Goblin Chief (55,413,567/400,000,000) 12% 
-Lv.105 Nine-tailed Fox Garam (93,698,474/400,000,000) 25% 
-Lv.105 Snowman General Gast (250,902,339/ 400,000,000) 55%
+Lv.105 Viper Clan Leader (400,000,000/400,000,000) 100%
+Lv.105 Lava Slime King (55,413,567/400,000,000) 12% 
+Lv.105 Altered Mad Panda MK-3 (250,902,339/400,000,000) 55% 
+Lv.105 Furious Desert BullWorm (93,698,474/ 400,000,000) 52%
 
 """
 prompt_template = ChatPromptTemplate.from_messages([
@@ -110,7 +104,9 @@ async def sayHello(interaction: discord.Interaction):
         res = result[idx]
         for line in res:
             text_output += line[1][0] + "\n"
+            print(line)
     final = chain.invoke(text_output)
+    # final = text_output
     await interaction.response.send_message(final)
 
 

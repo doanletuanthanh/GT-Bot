@@ -1,14 +1,4 @@
-# from paddleocr import PaddleOCR
-# # Paddleocr supports Chinese, English, French, German, Korean and Japanese.
-# # You can set the parameter `lang` as `ch`, `en`, `french`, `german`, `korean`, `japan`
-# # to switch the language model in order.
-# ocr = PaddleOCR(use_angle_cls=False, lang='en', use_gpu=True, det_model_dir="en_number_mobile_v2.0_rec_infer.tar") # need to run only once to download and load model into memory
-# img_path = 'test-image.jpg'
-# result = ocr.ocr(img_path, cls=False)
-# for idx in range(len(result)):
-#     res = result[idx]
-#     for line in res:
-#         print(line)
+
 
 
 import pygetwindow
@@ -18,7 +8,7 @@ import numpy as np
 import time
 
 
-path = 'result_capture.jpg'
+path = 'aaaa.jpg'
 titles = pygetwindow.getAllTitles()
 
 window = pygetwindow.getWindowsWithTitle("BlueStacks App Player")[0]
@@ -33,28 +23,47 @@ print(left, top, right, bottom)
 click_x = left + int(window_width * 0.9087)   # 96.4
 click_y = top + int(window_height * 0.9262)   # 50% của chiều cao cửa sổ
 # Thực hiện sự kiện nhấp chuột
-pyautogui.click(click_x, click_y)
-time.sleep(1)  
+# pyautogui.click(click_x, click_y)
+# time.sleep(1)  
 
 
 
-# a = pyautogui.screenshot(region=(left, top, window_width, window_height))
+a = pyautogui.screenshot(region=(left, top, window_width, window_height))
 
-# crop_left = int(0.066 * window_width)     # 50px / 751px ~ 6.6%
-# crop_top = int(0.473 * window_height)     # 220px / 464px ~ 47.4%
-# crop_right = int(0.133 * window_width)    # 100px / 751px ~ 13.3% (751 - 100 = 651)
-# crop_bottom = int(0.022 * window_height)  # 10px / 464px ~ 2.2% (464 - 10 = 454)
-# crop_text = int(0.1731*window_width)
-# print(crop_left, crop_top, crop_right, crop_bottom)
-# # # Cắt ảnh với tỷ lệ thay vì giá trị cố định
+crop_left = int(0.066 * window_width)     # 50px / 751px ~ 6.6%
+crop_top = int(0.45 * window_height)     # 220px / 464px ~ 47.4%
+crop_right = int(0.08 * window_width)    # 100px / 751px ~ 13.3% (751 - 100 = 651)
+crop_bottom = int(0.08 * window_height)  # 10px / 464px ~ 2.2% (464 - 10 = 454)
+crop_text = int(0.1731*window_width)
+print(crop_left, crop_top, crop_right, crop_bottom)
+# # Cắt ảnh với tỷ lệ thay vì giá trị cố định
 
-# # a = a.crop((crop_left, crop_top, window_width - crop_right, window_height - crop_bottom))
-# # a = a.crop((50, 220, right - left - 100, bottom - top - 10))
-# a = np.array(a)
-# height, width, _ = a.shape
-# a[height-crop_text:height, width-crop_text:width] = [255, 255, 255]
+a = a.crop((crop_left, crop_top, window_width - crop_right, window_height - crop_bottom))
+# a = a.crop((50, 220, right - left - 100, bottom - top - 10))
+a = np.array(a)
+height, width, _ = a.shape
+a[height-crop_text:height, width-crop_text:width] = [255, 255, 255]
 # a = Image.fromarray(a)
+# a.save(path)
 # a.show()
+
+
+from paddleocr import PaddleOCR
+# Paddleocr supports Chinese, English, French, German, Korean and Japanese.
+# You can set the parameter `lang` as `ch`, `en`, `french`, `german`, `korean`, `japan`
+# to switch the language model in order.
+ocr = PaddleOCR(use_angle_cls=False, lang='en', use_gpu=True, det_model_dir="en_number_mobile_v2.0_rec_infer.tar") # need to run only once to download and load model into memory
+
+text_output = ""
+result = ocr.ocr(a, cls=False)
+for idx in range(len(result)):
+    res = result[idx]
+    for line in res:
+        text_output += line[1][0] + "\n"
+print(text_output)
+
+
+
 # from langchain_core.prompts import ChatPromptTemplate
 # from langchain_core.output_parsers import StrOutputParser
 # from langchain_groq import ChatGroq
